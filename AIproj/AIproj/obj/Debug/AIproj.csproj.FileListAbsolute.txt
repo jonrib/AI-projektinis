@@ -1,0 +1,10 @@
+C:\Users\Jonas\Desktop\AIproj\AIproj\bin\Debug\AIproj.exe.config
+C:\Users\Jonas\Desktop\AIproj\AIproj\bin\Debug\AIproj.exe
+C:\Users\Jonas\Desktop\AIproj\AIproj\bin\Debug\AIproj.pdb
+C:\Users\Jonas\Desktop\AIproj\AIproj\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Jonas\Desktop\AIproj\AIproj\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Jonas\Desktop\AIproj\AIproj\obj\Debug\AIproj.csprojAssemblyReference.cache
+C:\Users\Jonas\Desktop\AIproj\AIproj\obj\Debug\AIproj.csproj.CoreCompileInputs.cache
+C:\Users\Jonas\Desktop\AIproj\AIproj\obj\Debug\AIproj.csproj.CopyComplete
+C:\Users\Jonas\Desktop\AIproj\AIproj\obj\Debug\AIproj.exe
+C:\Users\Jonas\Desktop\AIproj\AIproj\obj\Debug\AIproj.pdb
