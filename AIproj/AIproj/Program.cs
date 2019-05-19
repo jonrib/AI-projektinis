@@ -20,7 +20,45 @@ namespace AIproj
             List<Lexem> allLexems = GetAllLexems(all);
             List<Lexem> conc = GetConcentatedLexems(allLexems);
             CountProbabilitiesForLexems(conc);
+            Console.WriteLine(CountProbabilityForHeadline("How 'RuPaul\u2019s Drag Race' Is Teaching Straight People About Queer Culture".ToLower(), "QUEER VOICES", conc).ToString());
             Console.ReadKey();
+        }
+
+        static double CountProbabilityForHeadline(string headline, string topic, List<Lexem> all)
+        {
+            List<string> words = new List<string>();
+            Regex rgx = new Regex("[a-zA-Z0-9\']+");
+            foreach (Match match in rgx.Matches(headline))
+            {
+                words.Add(match.Value);
+            }
+            List<double> wordProbs = new List<double>();
+            foreach (string word in words)
+            {
+                Lexem lex = all.Find(x => x.word.Equals(word));
+                if (lex == null)
+                {
+                    wordProbs.Add(0.4);
+                }
+                else
+                {
+                    //Reiketu protingiau
+                    if (lex.vals[topic] >= 0.25)
+                    {
+                        wordProbs.Add(lex.vals[topic]);
+                    }
+                }
+
+            }
+            double sum1 = 1;
+            double sum2 = 1; 
+            foreach (double prob in wordProbs)
+            {
+                sum1 *= prob;
+                sum2 *= (1 - prob);
+            }
+            return sum1 / (sum1 + sum2);
+
         }
 
         static List<Lexem> GetConcentatedLexems(List<Lexem> all)
@@ -55,7 +93,7 @@ namespace AIproj
                 List<string> headlineLexems = new List<string>();
                 foreach (Match match in rgx.Matches(obj.headline))
                 {
-                    headlineLexems.Add(match.Value);
+                    headlineLexems.Add(match.Value.ToLower());
                 }
                 foreach (string headlineW in headlineLexems)
                 {
@@ -80,19 +118,18 @@ namespace AIproj
             {
                 foreach (string key in lex.counts.Keys)
                 {
-                    double pwkey = (lex.counts[key] / TotalCount[key])*100;
-                    double sumpw = pwkey; 
+                    double pwkey = (double)lex.counts[key] / TotalCount[key];
+                    double sumpw = pwkey;
 
                     foreach (string otherKey in lex.counts.Keys)
                     {
                         if (!otherKey.Equals(key))
                         {
-                            double pw = lex.counts[otherKey] / TotalCount[otherKey];
+                            double pw = (double)lex.counts[otherKey] / TotalCount[otherKey];
                             sumpw += pw;
                         }
                     }
-
-                    lex.vals.Add(key, pwkey / sumpw);
+                    lex.vals.Add(key, (double)pwkey / sumpw);
                 }
             }
         }
