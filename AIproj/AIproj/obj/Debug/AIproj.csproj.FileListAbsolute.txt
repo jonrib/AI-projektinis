@@ -18,3 +18,13 @@ C:\Users\Jonas\Desktop\AIprojektinis\AIproj\AIproj\obj\Debug\AIproj.csproj.CoreC
 C:\Users\Jonas\Desktop\AIprojektinis\AIproj\AIproj\obj\Debug\AIproj.csproj.CopyComplete
 C:\Users\Jonas\Desktop\AIprojektinis\AIproj\AIproj\obj\Debug\AIproj.exe
 C:\Users\Jonas\Desktop\AIprojektinis\AIproj\AIproj\obj\Debug\AIproj.pdb
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\bin\Debug\AIproj.exe.config
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\bin\Debug\AIproj.exe
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\bin\Debug\AIproj.pdb
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\bin\Debug\Newtonsoft.Json.dll
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\bin\Debug\Newtonsoft.Json.xml
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\obj\Debug\AIproj.csprojAssemblyReference.cache
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\obj\Debug\AIproj.csproj.CoreCompileInputs.cache
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\obj\Debug\AIproj.csproj.CopyComplete
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\obj\Debug\AIproj.exe
+C:\Users\ugand\Documents\GitHub\AI-projektinis\AIproj\AIproj\obj\Debug\AIproj.pdb

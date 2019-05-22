@@ -13,18 +13,110 @@ namespace AIproj
     class Program
     {
         static Dictionary<string, int> TotalCount = new Dictionary<string, int>();
+        static Dictionary<string, int> TotalCountPart = new Dictionary<string, int>();
+        static Dictionary<int , DictionaryHolder> TotalPartCount = new Dictionary<int, DictionaryHolder>();
+        //static bool show = false;
+        static string Data = "News_Category_Dataset_v2.json";
+        static int lineCount = File.ReadLines(Data).Count(); //Apskaiciuoja eiluciu kieki
+        static List<Lexem> allLearning = new List<Lexem>();
+        static List<Lexem> allTesting = new List<Lexem>();
 
         static void Main(string[] args)
         {
-            List<DataObject> all = ReadAllData("News_Category_Dataset_v2.json");
-            List<Lexem> allLexems = GetAllLexems(all);
-            List<Lexem> conc = GetConcentatedLexems(allLexems);
-            CountProbabilitiesForLexems(conc);
-            Console.WriteLine(CountProbabilityForHeadline("How 'RuPaul\u2019s Drag Race' Is Teaching Straight People About Queer Culture".ToLower(), "QUEER VOICES", conc).ToString());
+            
+            Console.WriteLine();
+            CrossValidation();
+
+
+            //            List<DataObject> all = ReadAllData(Data);
+            //            List<Lexem> allLexems = GetAllLexems(all);
+            //            List<Lexem> conc = GetConcentatedLexems(allLexems);
+            //            CountProbabilitiesForLexems(conc);
+            //;
+            //            Console.WriteLine(CountProbabilityForHeadline("How 'RuPaul\u2019s Drag Race' Is Teaching Straight People About Queer Culture".ToLower(), "CRIME", conc, 3).ToString());
+            //            
             Console.ReadKey();
+            
         }
 
-        static double CountProbabilityForHeadline(string headline, string topic, List<Lexem> all)
+        public static void CrossValidation()
+        {
+            List<DataObject> allData = ReadAllData(Data);
+            List<Lexem> allLexems = GetAllLexems(allData);
+            for (int i = 0; i < 10; i++)
+            {
+                allLearning.Clear();
+                allTesting.Clear();
+                Learning(i, allLexems);
+                Testing(i, allLexems);
+
+                CountTotalCountPart(allLearning, i);
+                List<Lexem> conc = GetConcentatedLexems(allLearning);
+                CountProbabilitiesForPartLexems(conc, i);
+
+                //List<Lexem> allLexemsTesting = GetAllLexems(allTesting);
+                Console.WriteLine("--------------------------------------");
+                //Console.WriteLine(allLexemsTesting);
+                CompareLexems(allLearning, allTesting, i);
+                Console.WriteLine("--------------------------------------");
+                //Ko truksta, tai paduoti testinius duomenis.
+                //Console.WriteLine(CountProbabilityForHeadline("How 'RuPaul\u2019s Drag Race' Is Teaching Straight People About Queer Culture".ToLower(), "CRIME", conc, 3).ToString());
+            }
+        }
+
+        public static void Learning(int block, List<Lexem> all)
+        {
+
+            
+            for (int i = 0; i < all.Count; i++)
+                if (i < all.Count / 10 * block || i >= all.Count / 10 * (block + 1))
+                   // using (StreamReader sr = new StreamReader(Data))
+                   // {
+                        for (int k = 0; k < all.Count; k++)
+                        {
+                            if (k == i)
+                            {
+                                allLearning.Add(all[i]);
+                            }
+                        }
+
+                  //  }
+        }
+
+        public static void Testing(int block, List<Lexem> all)
+        {
+            for (int i = 0; i < all.Count; i++)
+                if (i < all.Count / 10 * block || i >= all.Count / 10 * (block + 1))
+                    //using (StreamReader sr = new StreamReader(Data))
+                    //{
+                        for (int k = 0; k < all.Count; k++)
+                        {
+                            if (k == i)
+                            {
+                                allTesting.Add(all[i]);
+
+                            }
+                        }
+
+                    //}
+        }
+
+
+        public static void CountTotalCountPart(List<Lexem> all, int part)
+        {
+            TotalPartCount[part] = new DictionaryHolder();
+            foreach (Lexem lex in all)
+            {
+                string cat = lex.counts.Keys.ElementAt(0);
+                int val = 0;
+                TotalPartCount[part].TotalCount.TryGetValue(cat, out val);
+                TotalPartCount[part].TotalCount[cat] = val + 1;
+            }
+        }
+
+
+
+        static double CountProbabilityForHeadline(string headline, string topic, List<Lexem> all, int N)
         {
             List<string> words = new List<string>();
             Regex rgx = new Regex("[a-zA-Z0-9\']+");
@@ -42,23 +134,50 @@ namespace AIproj
                 }
                 else
                 {
-                    //Reiketu protingiau
-                    if (lex.vals[topic] >= 0.25)
-                    {
+                    if (!lex.vals.Keys.Contains(topic))
+                        wordProbs.Add(0.4);
+                    else
                         wordProbs.Add(lex.vals[topic]);
-                    }
                 }
 
             }
+            wordProbs.Sort();
+            List<double> actualVals = new List<double>();
+            for (int i = wordProbs.Count-1; i >= 0 && actualVals.Count != N; i--)
+            {
+                actualVals.Add(wordProbs[i]);
+            }
+
             double sum1 = 1;
             double sum2 = 1; 
-            foreach (double prob in wordProbs)
+            foreach (double prob in actualVals)
             {
                 sum1 *= prob;
                 sum2 *= (1 - prob);
             }
             return sum1 / (sum1 + sum2);
 
+        }
+
+        static void CompareLexems(List<Lexem> lexPart, List<Lexem> remain, int part)
+        {
+            int correct = 0;
+            int all = remain.Count;
+            foreach (Lexem lex in remain)
+            {
+                string cat = lex.counts.Keys.ElementAt(0);
+                Lexem actual = lexPart.Find(x => x.word == lex.word);
+                if (actual != null && actual.vals.Keys.Contains(cat))
+                {
+                    double prob = actual.vals[cat];
+                    if (prob >= 0.5)
+                    {
+                        correct += 1;
+                    }
+                }
+            }
+            //BENDRAS EFEKTYVUMAS
+            Console.WriteLine((double)correct/all);
         }
 
         static List<Lexem> GetConcentatedLexems(List<Lexem> all)
@@ -105,11 +224,30 @@ namespace AIproj
                     TotalCount.TryGetValue(obj.category, out val);
                     TotalCount[obj.category] = val + 1;
                 }
-
-                
-
             }
             return lexems;
+        }
+
+        static void CountProbabilitiesForPartLexems(List<Lexem> allPart, int part)
+        {
+            foreach (Lexem lex in allPart)
+            {
+                foreach (string key in lex.counts.Keys)
+                {
+                    double pwkey = (double)lex.counts[key] / TotalPartCount[part].TotalCount[key];
+                    double sumpw = pwkey;
+
+                    foreach (string otherKey in lex.counts.Keys)
+                    {
+                        if (!otherKey.Equals(key))
+                        {
+                            double pw = (double)lex.counts[otherKey] / TotalPartCount[part].TotalCount[otherKey];
+                            sumpw += pw;
+                        }
+                    }
+                    lex.vals[key] = (double)pwkey / sumpw;
+                }
+            }
         }
 
         static void CountProbabilitiesForLexems(List<Lexem> all)
