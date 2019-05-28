@@ -24,27 +24,34 @@ namespace AIproj
 
         static void Main(string[] args)
         {
-            
-            Console.WriteLine();
-            CrossValidation();
-
-
-            //            List<DataObject> all = ReadAllData(Data);
-            //            List<Lexem> allLexems = GetAllLexems(all);
-            //            List<Lexem> conc = GetConcentatedLexems(allLexems);
-            //            CountProbabilitiesForLexems(conc);
-            //;
-            //            Console.WriteLine(CountProbabilityForHeadline("How 'RuPaul\u2019s Drag Race' Is Teaching Straight People About Queer Culture".ToLower(), "CRIME", conc, 3).ToString());
-            //            
+            CrossValidation();   
             Console.ReadKey();
             
         }
 
+        static int StartUp()
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("--- Antraščių kategorijų klasifikavimo sistema ---");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("--- Įveskite segmentų kiekį kryž. patikroje    ---");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write    ("--- Jūsų norimas kiekis: ");
+            int N = Convert.ToInt32(Console.ReadLine());
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write    ("--- Pradedama dirbti su " + lineCount + " skirtingais duomenimis");
+            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("-----------------------------");
+            return N;
+        }
+
         public static void CrossValidation()
         {
+            int N=StartUp();
             List<DataObject> allData = ReadAllData(Data);
             List<Lexem> allLexems = GetAllLexems(allData);
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < N; i++)
             {
                 allLearning.Clear();
                 allTesting.Clear();
@@ -52,16 +59,22 @@ namespace AIproj
                 Testing(i, allLexems);
                 CountTotalCountPart(allLearning, i);
                 List<Lexem> conc = GetConcentatedLexemsAndCount(allLearning, allTesting, i);
-                //CountProbabilitiesForPartLexems(conc, i); KITAIP
-
-                //List<Lexem> allLexemsTesting = GetAllLexems(allTesting);
-                //Console.WriteLine(allLexemsTesting);
-
-                //CompareLexems(allLearning, allTesting, i); KITAIP
-
-                //Ko truksta, tai paduoti testinius duomenis.
-                //Console.WriteLine(CountProbabilityForHeadline("How 'RuPaul\u2019s Drag Race' Is Teaching Straight People About Queer Culture".ToLower(), "CRIME", conc, 3).ToString());
             }
+        }
+
+        static List<DataObject> ReadAllData(string data)
+        {
+            List<DataObject> all = new List<DataObject>();
+            using (StreamReader reader = new StreamReader(data))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    DataObject m = JsonConvert.DeserializeObject<DataObject>(line);
+                    all.Add(m);
+                }
+            }
+            return all;
         }
 
         public static string GetHeadlineCategory(List<Lexem> lexems, string headline, int N)
@@ -188,18 +201,22 @@ namespace AIproj
                     {
                         correct += 1;
                     }
-                }
+                }//////NEREIKAI SITO NENAUDOJA NIEKAS
             }
-            SegmentCount += 1; //Kam cia globalus kintamasis???
+            SegmentCount += 1; //Kam cia globalus kintamasis??? 
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("-----------------------------");
-            Console.WriteLine("      "+SegmentCount+" SEGMENTAS");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("      "+SegmentCount+" SEGMENTAAAAAAAAAAAAAAAS");
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("-----------------------------");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("  BENDRAS TIKSLUMAS " + String.Format("{0:0.00}", ((double)correct / all) * 100)+ "%");
         }
 
         static List<Lexem> GetConcentatedLexemsAndCount(List<Lexem> all, List<Lexem> remain, int part)
         {
-            Console.WriteLine("Counting for "+(part+1));
+            //Console.WriteLine("Counting for "+(part+1));
             List<Lexem> concentated = new List<Lexem>();
             all.Sort();
             remain.Sort();
@@ -242,10 +259,13 @@ namespace AIproj
                     remain.Remove(remain[0]);
                 }
             }
-
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("-----------------------------");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("      " + (part+1) + " SEGMENTAS");
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("-----------------------------");
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("  BENDRAS TIKSLUMAS " + String.Format("{0:0.00}", ((double)correct / allRemainCount) * 100) + "%");
 
             return concentated;
@@ -301,7 +321,7 @@ namespace AIproj
 
         static void CountProbabilitiesForPartLexems(List<Lexem> allPart, int part)
         {
-            Console.WriteLine("Count probabilities for part " + (part+1));
+            //Console.WriteLine("Count probabilities for part " + (part+1));
             foreach (Lexem lex in allPart)
             {
                 foreach (string key in lex.counts.Keys)
@@ -324,7 +344,7 @@ namespace AIproj
                     }
                 }
             }
-            Console.WriteLine("Done count probabilities for part " + (part + 1));
+            //Console.WriteLine("Done count probabilities for part " + (part + 1));
         }
 
         static void CountProbabilitiesForLexems(List<Lexem> all)
@@ -348,20 +368,5 @@ namespace AIproj
                 }
             }
         }
-
-        static List<DataObject> ReadAllData(string data)
-        {
-            List<DataObject> all = new List<DataObject>();
-            using (StreamReader reader = new StreamReader(data))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    DataObject m = JsonConvert.DeserializeObject<DataObject>(line);
-                    all.Add(m);
-                }
-            }
-            return all;
-        } 
     }
 }
