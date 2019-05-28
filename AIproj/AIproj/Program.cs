@@ -20,6 +20,7 @@ namespace AIproj
         static int lineCount = File.ReadLines(Data).Count(); //Apskaiciuoja eiluciu kieki
         static List<Lexem> allLearning = new List<Lexem>();
         static List<Lexem> allTesting = new List<Lexem>();
+        static int SegmentCount=0;
 
         static void Main(string[] args)
         {
@@ -55,10 +56,8 @@ namespace AIproj
                 CountProbabilitiesForPartLexems(conc, i);
 
                 //List<Lexem> allLexemsTesting = GetAllLexems(allTesting);
-                Console.WriteLine("--------------------------------------");
                 //Console.WriteLine(allLexemsTesting);
                 CompareLexems(allLearning, allTesting, i);
-                Console.WriteLine("--------------------------------------");
                 //Ko truksta, tai paduoti testinius duomenis.
                 //Console.WriteLine(CountProbabilityForHeadline("How 'RuPaul\u2019s Drag Race' Is Teaching Straight People About Queer Culture".ToLower(), "CRIME", conc, 3).ToString());
             }
@@ -87,8 +86,7 @@ namespace AIproj
         {
             for (int i = 0; i < all.Count; i++)
                 if (i < all.Count / 10 * block || i >= all.Count / 10 * (block + 1))
-                    //using (StreamReader sr = new StreamReader(Data))
-                    //{
+
                         for (int k = 0; k < all.Count; k++)
                         {
                             if (k == i)
@@ -97,8 +95,6 @@ namespace AIproj
 
                             }
                         }
-
-                    //}
         }
 
 
@@ -176,8 +172,11 @@ namespace AIproj
                     }
                 }
             }
-            //BENDRAS EFEKTYVUMAS
-            Console.WriteLine((double)correct/all);
+            SegmentCount += 1;
+            Console.WriteLine("-----------------------------");
+            Console.WriteLine("      "+SegmentCount+" SEGMENTAS");
+            Console.WriteLine("-----------------------------");
+            Console.WriteLine("  BENDRAS TIKSLUMAS " + String.Format("{0:0.00}", ((double)correct / all) * 100)+ "%");
         }
 
         static List<Lexem> GetConcentatedLexems(List<Lexem> all)
