@@ -64,6 +64,23 @@ namespace AIproj
             }
         }
 
+        public static string GetHeadlineCategory(List<Lexem> lexems, string headline, int N)
+        {
+            headline = headline.ToLower();
+            double prob = -1;
+            string category = "";
+            foreach (string key in TotalCount.Keys)
+            {
+                double tmp = CountProbabilityForHeadline(key, headline, lexems, N);
+                if (tmp > prob)
+                {
+                    prob = tmp;
+                    category = key;
+                }
+            }
+            return category;
+        }
+
         public static void Learning(int block, List<Lexem> all)
         {
 
