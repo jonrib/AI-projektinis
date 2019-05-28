@@ -50,14 +50,15 @@ namespace AIproj
                 allTesting.Clear();
                 Learning(i, allLexems);
                 Testing(i, allLexems);
-
                 CountTotalCountPart(allLearning, i);
-                List<Lexem> conc = GetConcentatedLexems(allLearning);
-                CountProbabilitiesForPartLexems(conc, i);
+                List<Lexem> conc = GetConcentatedLexemsAndCount(allLearning, allTesting, i);
+                //CountProbabilitiesForPartLexems(conc, i); KITAIP
 
                 //List<Lexem> allLexemsTesting = GetAllLexems(allTesting);
                 //Console.WriteLine(allLexemsTesting);
-                CompareLexems(allLearning, allTesting, i);
+
+                //CompareLexems(allLearning, allTesting, i); KITAIP
+
                 //Ko truksta, tai paduoti testinius duomenis.
                 //Console.WriteLine(CountProbabilityForHeadline("How 'RuPaul\u2019s Drag Race' Is Teaching Straight People About Queer Culture".ToLower(), "CRIME", conc, 3).ToString());
             }
@@ -162,21 +163,75 @@ namespace AIproj
             foreach (Lexem lex in remain)
             {
                 string cat = lex.counts.Keys.ElementAt(0);
-                Lexem actual = lexPart.Find(x => x.word == lex.word);
+                Lexem actual = lexPart.Find(x => x.word == lex.word); // sitas uztrunka
                 if (actual != null && actual.vals.Keys.Contains(cat))
                 {
                     double prob = actual.vals[cat];
-                    if (prob >= 0.5)
+                    if (prob >= 0.5) //sitas reikia gal ne 0.5 o issirinkt labiausiai tiketina
                     {
                         correct += 1;
                     }
                 }
             }
-            SegmentCount += 1;
+            SegmentCount += 1; //Kam cia globalus kintamasis???
             Console.WriteLine("-----------------------------");
             Console.WriteLine("      "+SegmentCount+" SEGMENTAS");
             Console.WriteLine("-----------------------------");
             Console.WriteLine("  BENDRAS TIKSLUMAS " + String.Format("{0:0.00}", ((double)correct / all) * 100)+ "%");
+        }
+
+        static List<Lexem> GetConcentatedLexemsAndCount(List<Lexem> all, List<Lexem> remain, int part)
+        {
+            Console.WriteLine("Counting for "+(part+1));
+            List<Lexem> concentated = new List<Lexem>();
+            all.Sort();
+            remain.Sort();
+
+            int allRemainCount = remain.Count;
+            int correct = 0;
+
+            for (int i = 0; i < all.Count; i++)
+            {
+                Lexem lex = all[i];
+                while (i + 1 < all.Count && all[i + 1].word == lex.word)
+                {
+                    Lexem next = all[i + 1];
+                    foreach (string key in next.counts.Keys)
+                    {
+                        int val = 0;
+                        lex.counts.TryGetValue(key, out val);
+                        lex.counts[key] = val + 1;
+                    }
+                    i++;
+                }
+
+                concentated.Add(lex);
+            }
+
+            CountProbabilitiesForPartLexems(concentated, part);
+
+            foreach (Lexem lex in concentated)
+            {
+                string word = lex.word;
+
+                while (remain.Count > 0 && word == remain[0].word)
+                {
+                    string cat = lex.counts.Keys.ElementAt(0);
+                    
+                    if (lex.GetMostProbable() == cat)
+                    {
+                        correct += 1;
+                    }
+                    remain.Remove(remain[0]);
+                }
+            }
+
+            Console.WriteLine("-----------------------------");
+            Console.WriteLine("      " + (part+1) + " SEGMENTAS");
+            Console.WriteLine("-----------------------------");
+            Console.WriteLine("  BENDRAS TIKSLUMAS " + String.Format("{0:0.00}", ((double)correct / allRemainCount) * 100) + "%");
+
+            return concentated;
         }
 
         static List<Lexem> GetConcentatedLexems(List<Lexem> all)
@@ -229,6 +284,7 @@ namespace AIproj
 
         static void CountProbabilitiesForPartLexems(List<Lexem> allPart, int part)
         {
+            Console.WriteLine("Count probabilities for part " + (part+1));
             foreach (Lexem lex in allPart)
             {
                 foreach (string key in lex.counts.Keys)
@@ -245,8 +301,13 @@ namespace AIproj
                         }
                     }
                     lex.vals[key] = (double)pwkey / sumpw;
+                    if (lex.vals[key] == 0)
+                    {
+                        lex.vals[key] = 0.01;
+                    }
                 }
             }
+            Console.WriteLine("Done count probabilities for part " + (part + 1));
         }
 
         static void CountProbabilitiesForLexems(List<Lexem> all)

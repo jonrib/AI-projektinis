@@ -27,5 +27,21 @@ namespace AIproj
         {
             return this.word.CompareTo(other.word);
         }
+
+        public string GetMostProbable()
+        {
+            string most = "";
+            double defaultProb = -1;
+            foreach (string key in vals.Keys)
+            {
+                if (vals[key] > defaultProb)
+                {
+                    most = key;
+                    defaultProb = vals[key];
+                }
+
+            }
+            return most;
+        }
     }
 }
